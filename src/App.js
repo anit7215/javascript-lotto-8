@@ -1,48 +1,32 @@
-import { Console, Random } from "@woowacourse/mission-utils";
-import Validator from "./utils/Validator";
+import InputView from "./views/InputView.js";
+import OutputView from "./views/OutputView.js";
+import Lotto from "./Lotto.js";
+import { Random } from "@woowacourse/mission-utils";
 
 class App {
   LottoNumbers = [];
 
   async run() {
-    const purchaseAmountInput = await Console.readLineAsync(
-      "구입금액을 입력해 주세요.\n"
-    );
-    Validator.validatePurchaseAmount(purchaseAmountInput);
-    const lottoAmount = Number(purchaseAmountInput) / 1000;
+    const purchaseAmount = await InputView.purchaseAmountInput();
+    const lottoCount = purchaseAmount / 1000;
 
-    this.printLottoNumber(lottoAmount);
+    this.generateLottos(lottoCount);
+    OutputView.printLottoNumber(this.LottoNumbers);
 
-    const winningNumbersInput = await Console.readLineAsync(
-      "당첨 번호를 입력해 주세요.\n"
-    );
-    const winningNumbers = winningNumbersInput.split(",").map(Number);
-
-    Validator.validateWinningNumbers(winningNumbers);
-
-    const bonusNumberInput = await Console.readLineAsync(
-      "보너스 번호를 입력해주세요.\n"
-    );
-    const bonusNumber = Number(bonusNumberInput);
-
-    Validator.validateBonusNumber(bonusNumber, winningNumbers);
+    const winningNumbers = await InputView.winningNumbersInput();
+    const bonusNumber = await InputView.bonusNumberInput(winningNumbers);
 
     const results = this.calculateResults(winningNumbers, bonusNumber);
-    const profitRate = this.calculateProfitRate(results, purchaseAmountInput);
-    this.printStatistics(results, profitRate);
+    const profitRate = this.calculateProfitRate(results, purchaseAmount);
+
+    OutputView.printStatistics(results, profitRate);
   }
 
-  printLottoNumber(lottoCount) {
-    Console.print(`\n${lottoCount}개를 구매했습니다.`);
-    for (let i = 0; i < lottoCount; i++) {
-      const lottoNumber = this.generateLottoNumber();
-      Console.print(`[${lottoNumber.join(", ")}]`);
-      this.LottoNumbers.push(lottoNumber);
+  generateLottos(count) {
+    for (let i = 0; i < count; i++) {
+      const numbers = Random.pickUniqueNumbersInRange(1, 45, 6);
+      this.LottoNumbers.push(new Lotto(numbers));
     }
-  }
-
-  generateLottoNumber() {
-    return Random.pickUniqueNumbersInRange(1, 45, 6).sort((a, b) => a - b);
   }
 
   calculateResults(winningNumbers, bonusNumber) {
@@ -55,10 +39,8 @@ class App {
     };
 
     this.LottoNumbers.forEach((lotto) => {
-      const matchCount = lotto.filter((num) =>
-        winningNumbers.includes(num)
-      ).length;
-      const bonusMatch = lotto.includes(bonusNumber);
+      const matchCount = lotto.countMatches(winningNumbers);
+      const bonusMatch = lotto.hasBonus(bonusNumber);
 
       if (matchCount === 6) result[6]++;
       else if (matchCount === 5 && bonusMatch) result["5+bonus"]++;
@@ -79,24 +61,8 @@ class App {
       6: 2000000000,
     };
     let totalPrize = 0;
-    for (const key in results) {
-      totalPrize += results[key] * PRIZE[key];
-    }
-    const profitRate = (totalPrize / purchaseAmount) * 100;
-    return Math.round(profitRate * 100) / 100;
-  }
-
-  printStatistics(results, profitRate) {
-    Console.print("\n당첨 통계");
-    Console.print("---");
-    Console.print(`3개 일치 (5,000원) - ${results[3]}개`);
-    Console.print(`4개 일치 (50,000원) - ${results[4]}개`);
-    Console.print(`5개 일치 (1,500,000원) - ${results[5]}개`);
-    Console.print(
-      `5개 일치, 보너스 볼 일치 (30,000,000원) - ${results["5+bonus"]}개`
-    );
-    Console.print(`6개 일치 (2,000,000,000원) - ${results[6]}개`);
-    Console.print(`총 수익률은 ${profitRate.toFixed(1)}%입니다.`);
+    for (const key in results) totalPrize += results[key] * PRIZE[key];
+    return Math.round((totalPrize / purchaseAmount) * 100 * 100) / 100;
   }
 }
 
