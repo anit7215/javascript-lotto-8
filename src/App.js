@@ -20,6 +20,11 @@ class App {
       "보너스 번호를 입력해주세요.\n"
     );
     this.validateBonusNumber(bonusNumberInput);
+    const bonusNumber = Number(bonusNumberInput);
+
+    const results = this.calculateResults(winningNumbers, bonusNumber);
+    const profitRate = this.calculateProfitRate(results, purchaseAmount);
+    this.printStatistics(results, profitRate);
   }
 
   amountToLottoCount(purchaseAmount) {
@@ -110,7 +115,20 @@ class App {
       totalPrize += results[key] * PRIZE[key];
     }
     const profitRate = (totalPrize / purchaseAmount) * 100;
-    return Math.round(profitRate * 10) / 10;
+    return Math.round(profitRate * 100) / 100;
+  }
+
+  printStatistics(results, profitRate) {
+    Console.print("\n당첨 통계");
+    Console.print("---");
+    Console.print(`3개 일치 (5,000원) - ${results[3]}개`);
+    Console.print(`4개 일치 (50,000원) - ${results[4]}개`);
+    Console.print(`5개 일치 (1,500,000원) - ${results[5]}개`);
+    Console.print(
+      `5개 일치, 보너스 볼 일치 (30,000,000원) - ${results["5+bonus"]}개`
+    );
+    Console.print(`6개 일치 (2,000,000,000원) - ${results[6]}개`);
+    Console.print(`총 수익률은 ${profitRate.toFixed(1)}%입니다.`);
   }
 }
 
