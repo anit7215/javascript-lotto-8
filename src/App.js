@@ -16,6 +16,10 @@ class App {
       .split(",")
       .map((num) => Number(num));
     this.validateWinningNumbers(winningNumbers);
+    const bonusNumberInput = await Console.readLineAsync(
+      "보너스 번호를 입력해주세요.\n"
+    );
+    this.validateBonusNumber(bonusNumberInput);
   }
 
   amountToLottoCount(purchaseAmount) {
@@ -55,6 +59,15 @@ class App {
     }
     if (new Set(winningNumbers).size !== winningNumbers.length) {
       throw new Error("[ERROR] 중복된 숫자가 있습니다.");
+    }
+  }
+  validateBonusNumber(bonusNumberInput) {
+    const bonusNumber = Number(bonusNumberInput);
+    if (isNaN(bonusNumber)) {
+      throw new Error("[ERROR] 숫자만 입력해 주세요.");
+    }
+    if (bonusNumber < 1 || bonusNumber > 45) {
+      throw new Error("[ERROR] 1 ~ 45 사이의 숫자를 입력해주세요.");
     }
   }
 }
