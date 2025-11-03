@@ -9,6 +9,14 @@ class App {
     );
     const lottoAmount = this.amountToLottoCount(purchaseAmount);
     this.printLottoNumber(lottoAmount);
+    const winningNumbersInput = await Console.readLineAsync(
+      "당첨 번호를 입력해 주세요.\n"
+    );
+    const winningNumbers = winningNumbersInput
+      .split(",")
+      .map((num) => Number(num));
+    this.validateWinningNumbers(winningNumbers);
+
   }
 
   amountToLottoCount(purchaseAmount) {
@@ -31,6 +39,21 @@ class App {
 
   generateLottoNumber() {
     return Random.pickUniqueNumbersInRange(1, 45, 6).sort((a, b) => a - b);
+  }
+
+  validateWinningNumbers(winningNumbers) {
+    if (winningNumbers.length !== 6) {
+      throw new Error("[ERROR] 당첨 번호 6개를 입력해 주세요.");
+    }
+    if (winningNumbers.some((num) => isNaN(num))) {
+      throw new Error("[ERROR] 숫자만 입력해 주세요.");
+    }
+    if (winningNumbers.some((num) => num < 1 || num > 45)) {
+      throw new Error("[ERROR] 1 ~ 45 사이의 숫자를 입력해주세요.");
+    }
+    if (new Set(winningNumbers).size !== winningNumbers.length) {
+      throw new Error("[ERROR] 중복된 숫자가 있습니다.");
+    }
   }
 }
 
