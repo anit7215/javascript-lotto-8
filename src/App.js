@@ -16,10 +16,12 @@ class App {
       .split(",")
       .map((num) => Number(num));
     this.validateWinningNumbers(winningNumbers);
-
   }
 
   amountToLottoCount(purchaseAmount) {
+    if (isNaN(purchaseAmount)) {
+      throw new Error("[ERROR] 숫자만 입력해 주세요.");
+    }
     if (purchaseAmount > 0 && purchaseAmount % 1000 !== 0) {
       throw new Error("[ERROR] 구입금액은 1,000원 단위로 입력해 주세요.");
     }
