@@ -29,13 +29,14 @@ class Validator {
   }
 
   static validateBonusNumber(bonusNumber, winningNumbers) {
-    if (isNaN(bonusNumber)) {
+    const number = Number(bonusNumber);
+    if (isNaN(number)) {
       throw new Error("[ERROR] 숫자만 입력해 주세요.");
     }
-    if (bonusNumber < 1 || bonusNumber > 45) {
+    if (number < 1 || number > 45) {
       throw new Error("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
     }
-    if (winningNumbers.includes(bonusNumber)) {
+    if (winningNumbers.includes(number)) {
       throw new Error("[ERROR] 보너스 번호는 당첨 번호와 중복될 수 없습니다.");
     }
   }
