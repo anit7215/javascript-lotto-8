@@ -96,6 +96,22 @@ class App {
 
     return result;
   }
+  calculateProfitRate(results, purchaseAmount) {
+    const PRIZE = {
+      3: 5000,
+      4: 50000,
+      5: 1500000,
+      "5+bonus": 30000000,
+      6: 2000000000,
+    };
+
+    let totalPrize = 0;
+    for (const key in results) {
+      totalPrize += results[key] * PRIZE[key];
+    }
+    const profitRate = (totalPrize / purchaseAmount) * 100;
+    return Math.round(profitRate * 10) / 10;
+  }
 }
 
 export default App;
