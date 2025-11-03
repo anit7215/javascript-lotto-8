@@ -61,6 +61,7 @@ class App {
       throw new Error("[ERROR] 중복된 숫자가 있습니다.");
     }
   }
+
   validateBonusNumber(bonusNumberInput) {
     const bonusNumber = Number(bonusNumberInput);
     if (isNaN(bonusNumber)) {
@@ -69,6 +70,31 @@ class App {
     if (bonusNumber < 1 || bonusNumber > 45) {
       throw new Error("[ERROR] 1 ~ 45 사이의 숫자를 입력해주세요.");
     }
+  }
+
+  calculateResults(winningNumbers, bonusNumber) {
+    const result = {
+      3: 0,
+      4: 0,
+      5: 0,
+      "5+bonus": 0,
+      6: 0,
+    };
+
+    this.LottoNumbers.forEach((lotto) => {
+      const matchCount = lotto.filter((num) =>
+        winningNumbers.includes(num)
+      ).length;
+      const bonusMatch = lotto.includes(bonusNumber);
+
+      if (matchCount === 6) result[6]++;
+      else if (matchCount === 5 && bonusMatch) result["5+bonus"]++;
+      else if (matchCount === 5) result[5]++;
+      else if (matchCount === 4) result[4]++;
+      else if (matchCount === 3) result[3]++;
+    });
+
+    return result;
   }
 }
 
